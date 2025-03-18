@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 typedef struct node{
     int idx;
     int neighbors_count;
     int* neighbors;
 } node;
 
+// global variable
 int N = 12;
 
 void create_graph(node *graph){

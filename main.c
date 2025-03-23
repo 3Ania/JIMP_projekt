@@ -1,15 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// struktura posiadająca pojedyńczy wierzchołek
 typedef struct node{
-    int idx;
-    int neighbors_count;
-    int* neighbors;
+    int idx; // indeks (numer) wierzchołka
+    int neighbors_count; // ilość sąsiadów (krawędzi) danego wierzchołka
+    int* neighbors; // lista sąsiadów (indeksy sąsiadów)
 } node;
 
-int N = 12;
+int N = 12; // ilość wierzchołków w grafie
 
-void create_graph(node *graph){
+void create_graph(node *graph){ // tworzy przykładowy graf
     int i;
     for(i = 0; i < N; i++){
         graph[i].idx = i;
@@ -84,33 +85,33 @@ void create_graph(node *graph){
     graph[11].neighbors[0] = 6;
 }
 
-void print_graph(node *graph){
+void print_graph(node *graph){ // wypisuje graf
     int i, j;
     for(i = 0; i < N; i++){
-        printf("%d: ", graph[i].idx);
-        int amount = graph[i].neighbors_count;
+        printf("%d: ", graph[i].idx); // wypisuje wierzchołek
+        int amount = graph[i].neighbors_count; // ilość sąsiadów
         for(j = 0; j < amount; j++){
-            printf("%d, ", graph[i].neighbors[j]);
+            printf("%d, ", graph[i].neighbors[j]); // wypisuje każdego sąsiada
         }
-        printf("nr of nodes: %d\n", amount);
+        printf("nr of nodes: %d\n", amount); // wypisuje ilość sąsiadów
     }
     printf("\n");
 }
 
-node min_node(node *graph){
+node min_node(node *graph){ // znajduje wierzchołek, posiadający najmniejszą ilość krawędzi z całego grafu (w przypadku wielu takich, zwraca wierzchołek o najmniejszym indeksie)
     int i;
     int min = N+1;
     node min_n;
     for(i = 0; i < N; i++){
-        if(graph[i].idx != -1 && graph[i].neighbors_count < min){
-            min = graph[i].neighbors_count;
-            min_n = graph[i];
+        if(graph[i].idx != -1 && graph[i].neighbors_count < min){ // jeżeli wierzchołek istnieje i ilość sąsiadów danego wierzchołka jest mniejsza od najmniejszej do tej pory znalezionej
+            min = graph[i].neighbors_count; // przypisuje aktualną najmniejszą ilość krawędzi do min
+            min_n = graph[i]; // szukany wierzchołek
         }
     }
-    return min_n;
+    return min_n; // zwraca znaleziony wierzchołek, o najmniejszej ilości sąsiadów
 }
 
-node min_neighbour(node start_node, node *graph){
+node min_neighbour(node start_node, node *graph){ // znajduje wierzchołek o najmniejszej ilości krawędzi spośród sąsiadów wierzchołka start_node
     int min = N+1;
     node min_n;
     int i;
@@ -123,7 +124,7 @@ node min_neighbour(node start_node, node *graph){
     return min_n;
 }
 
-void calculate_nr_of_nodes_in_parts(int* part_node_nr, int parts_amount){
+void calculate_nr_of_nodes_in_parts(int* part_node_nr, int parts_amount){ // wylicza, ile ma być wierzchołków w każdej części grafu
     int i;
     int how_much_to_add = N % parts_amount;
     for(i = 0; i < parts_amount; i++){
@@ -132,7 +133,7 @@ void calculate_nr_of_nodes_in_parts(int* part_node_nr, int parts_amount){
     }
 }
 
-void delete_node(node *graph, node n){
+void delete_node(node *graph, node n){ // usuwa wierzchołek (też z listy sąsiadów innych wierzchołków)
     // printf("n number: %d\n", n.idx);
     graph[n.idx].idx = -1;
     int i, j, k;
@@ -141,33 +142,35 @@ void delete_node(node *graph, node n){
             if(graph[i].neighbors[j] == n.idx){
                 k = j;
                 for(; k < graph[i].neighbors_count - 1; k++){
-                    graph[i].neighbors[k] = graph[i].neighbors[k+1];
-                }j = k;
-                graph[i].neighbors_count--;
+                    graph[i].neighbors[k] = graph[i].neighbors[k+1]; // przesuwa sąsiadów w liście sąsiadów tak, aby te które jeszcze nie są usunięte były na początku
+                }
+                graph[i].neighbors[k] = graph[i].neighbors[j]; // ostatni sąsiad, który nie będzie już widoczny to ten, który usuneliśmy
+                j = k;
+                graph[i].neighbors_count--; // zmniejsza ilość sąsiadów o 1
             }
         }
     }
 }
 
-void divide(node *graph, int parts_amount){
+void divide(node *graph, int parts_amount){ // dzieli graf
     // node start_node = min_node(graph);
     // printf("start: %d\n", start_node.idx);
-
-    int curr_node_amount = 1;
 
     int* part_node_nr = malloc(parts_amount * sizeof(int));
     calculate_nr_of_nodes_in_parts(part_node_nr, parts_amount);
     
+    int curr_node_amount = 1; // ilość wierzchołków w aktualnej grupie grupie
+
     node next, start_node;
     int i;
     for(i = 0; i < parts_amount; i++){
-        start_node = min_node(graph);
+        start_node = min_node(graph); // pobiera pierwszy "początkowy" wierzchołek dla i-tej grupy
         printf("start: %d\n", start_node.idx);
         // printf("i: %d, parts_mount: %d \n\n", i, parts_amount);
-        for(curr_node_amount = 1; curr_node_amount < part_node_nr[i]; curr_node_amount++){
-            next = min_neighbour(start_node, graph);
+        for(curr_node_amount = 1; curr_node_amount < part_node_nr[i]; curr_node_amount++){ // powtarza tyle razy ile ma być wierzchołków w grupie
+            next = min_neighbour(start_node, graph); // znajduje następny wierzchołek, który zostanie dodany do grupy
             printf("next: %d\n", next.idx);
-            delete_node(graph, start_node);
+            delete_node(graph, start_node); // usuwa ostatni wierzchołek
             // print_graph(graph);
             start_node = next;
         }
@@ -178,11 +181,13 @@ void divide(node *graph, int parts_amount){
 }
 
 int main(){
-    node* graph = malloc(N * sizeof(node));
+    node* graph = malloc(N * sizeof(node)); // tworzy graf - tablicę wierzchołków
     create_graph(graph);
     print_graph(graph);
 
-    int parts_amount = 4, margin = 10;
+    int parts_amount = 4, margin = 10; // ilość części i margines
 
-    divide(graph, parts_amount);
+    divide(graph, parts_amount); // dzieli graf
+
+    return 0;
 }

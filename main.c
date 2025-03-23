@@ -152,29 +152,36 @@ void delete_node(node *graph, node n){ // usuwa wierzchołek (też z listy sąsi
     }
 }
 
-void divide(node *graph, int parts_amount){ // dzieli graf
+void divide(node *graph, int parts_amount, int *graph_parts[parts_amount], int* part_node_nr){ // dzieli graf
     // node start_node = min_node(graph);
     // printf("start: %d\n", start_node.idx);
 
-    int* part_node_nr = malloc(parts_amount * sizeof(int));
+    
     calculate_nr_of_nodes_in_parts(part_node_nr, parts_amount);
+
+    int i = 0;
+    for(; i < parts_amount; i++){
+        graph_parts[i] = malloc(part_node_nr[i] * sizeof(int));
+    }
     
     int curr_node_amount = 1; // ilość wierzchołków w aktualnej grupie grupie
 
     node next, start_node;
-    int i;
     for(i = 0; i < parts_amount; i++){
         start_node = min_node(graph); // pobiera pierwszy "początkowy" wierzchołek dla i-tej grupy
-        printf("start: %d\n", start_node.idx);
+        graph_parts[i][0] = start_node.idx;
+        // printf("i, 0: %d\n", graph_parts[i][0]);
+        // printf("start: %d\n", start_node.idx);
         // printf("i: %d, parts_mount: %d \n\n", i, parts_amount);
         for(curr_node_amount = 1; curr_node_amount < part_node_nr[i]; curr_node_amount++){ // powtarza tyle razy ile ma być wierzchołków w grupie
             next = min_neighbour(start_node, graph); // znajduje następny wierzchołek, który zostanie dodany do grupy
-            printf("next: %d\n", next.idx);
+            graph_parts[i][curr_node_amount] = next.idx;
+            // printf("next: %d\n", next.idx);
             delete_node(graph, start_node); // usuwa ostatni wierzchołek
             // print_graph(graph);
             start_node = next;
         }
-        printf("New part: \n\n");
+        // printf("New part: \n\n");
         delete_node(graph, start_node);
         // print_graph(graph);
     }
@@ -187,7 +194,18 @@ int main(){
 
     int parts_amount = 4, margin = 10; // ilość części i margines
 
-    divide(graph, parts_amount); // dzieli graf
+    int *graph_parts[parts_amount];
+    int* part_node_nr = malloc(parts_amount * sizeof(int)); // ilość wierzchołków w grupie
+
+    divide(graph, parts_amount, graph_parts, part_node_nr); // dzieli graf
+
+    int i, j;
+    for(i = 0; i < parts_amount; i++){
+        printf("Grupa %d: ", i);
+        for(j = 0; j < part_node_nr[i]; j++){
+            printf("%d, ", graph_parts[i][j]);
+        }printf("\n");
+    }
 
     return 0;
 }

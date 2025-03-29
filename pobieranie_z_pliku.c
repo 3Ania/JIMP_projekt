@@ -45,31 +45,43 @@ void create_graph(node *graph, FILE *f_line3, FILE *f_line4, int node_amount){ /
 
     while(fscanf(f_line4, "%d;", &buff1) == 1){
         first = 0;
-        if(graph[idx].neighbors_count == 0) graph[idx].neighbors = malloc(buff1 * sizeof(int));
-        else graph[idx].neighbors = realloc(graph[idx].neighbors, (graph[idx].neighbors_count + buff1) * sizeof(int));
+        // printf("i: %d, buff1: %d - ", i, buff1);
         for(; i < buff1; i++){
-            if(idx == 4) printf(".");
+            // printf("i: %d] ", i);
             if(fscanf(f_line3, "%d;", &buff2) == 1){
+                // printf("*");
                 if(first == 0){
+                    idx = buff2;
                     graph[idx].idx = buff2;
-                    if(idx == 4) printf("(%d) - ", graph[idx].idx);
                     first++;
+                    if(graph[idx].neighbors_count == 0) graph[idx].neighbors = malloc(buff1 * sizeof(int));
+                    else graph[idx].neighbors = realloc(graph[idx].neighbors, (graph[idx].neighbors_count + buff1) * sizeof(int));
+                    // printf("first_idx: %d, ", idx);
                 }else{
+                    // printf("idx: %d - buff2: %d, ", idx, buff2);
                     graph[idx].neighbors[graph[idx].neighbor_idx] = buff2;
+                    // if(idx == 1) printf("graph[idx].neighbor_idx: %d, graph[idx].neighbors[graph[idx].neighbor_idx]: %d", graph[idx].neighbor_idx, graph[1].neighbors[0]);
+                    // printf("Jest1");
                     graph[idx].neighbors_count++;
+                    // printf("Jest2");
                     if(graph[buff2].neighbors_count == 0){
                         graph[buff2].neighbors = malloc(10 * sizeof(int));
+                        // printf("if1 ");
                     }else if(graph[buff2].neighbor_idx > graph[buff2].neighbors_count){
                         graph[buff2].neighbors = realloc(graph[buff2].neighbors, graph[buff2].neighbors_count * 2 * sizeof(int));
+                        // printf("else2 ");
                     }
                     graph[buff2].neighbors[graph[buff2].neighbor_idx] = idx;
                     graph[buff2].neighbors_count++;
                     graph[idx].neighbor_idx++;
                     graph[buff2].neighbor_idx++;
+                    // printf("koniec");
                 }
+            }else{
+                printf("Error\n");
             }
         }
-
-        idx++;
+        // printf("\n\n");
+        // idx++;
     }
 }

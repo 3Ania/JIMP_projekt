@@ -84,4 +84,38 @@ void create_graph(node *graph, FILE *f_line3, FILE *f_line4, int node_amount){ /
         // printf("\n\n");
         // idx++;
     }
+
+        //pobieranie ostatniego wierzchołka i jego sąsiadów
+        first = 0;
+        int next_char;
+        while (fscanf(f_line3, "%d;", &buff2) == 1) {
+            if (first == 0) {
+                printf("Dopisuje ostatni wierzcholek %d\n", buff2);
+                idx = buff2;
+                graph[idx].idx = buff2;
+                first++;
+                if (graph[idx].neighbors_count==0) graph[idx].neighbors = malloc(10 * sizeof(int));
+            } else {
+                graph[idx].neighbors[graph[idx].neighbor_idx] = buff2;
+                printf("Dopisuje sasiada %d\n", buff2);
+                graph[idx].neighbors_count++;
+                if(graph[buff2].neighbors_count == 0) {
+                    graph[buff2].neighbors = malloc(10 * sizeof(int));
+                } else if(graph[buff2].neighbor_idx > graph[buff2].neighbors_count) {
+                    graph[buff2].neighbors = realloc(graph[buff2].neighbors, 
+                        graph[buff2].neighbors_count * 2 * sizeof(int));
+                }
+                graph[buff2].neighbors[graph[buff2].neighbor_idx] = idx;
+                graph[buff2].neighbors_count++;
+                graph[idx].neighbor_idx++;
+                graph[buff2].neighbor_idx++;
+            }
+            next_char = fgetc(f_line3);
+            if (next_char == '\n' || next_char == EOF) {
+                break;
+            } else {
+                ungetc(next_char, f_line3); // Jeśli to nie '\n', zwróć znak na strumień
+            }
+        }
+
 }

@@ -90,14 +90,14 @@ void create_graph(node *graph, FILE *f_line3, FILE *f_line4, int node_amount){ /
         int next_char;
         while (fscanf(f_line3, "%d;", &buff2) == 1) {
             if (first == 0) {
-                printf("Dopisuje ostatni wierzcholek %d\n", buff2);
+                //printf("Dopisuje ostatni wierzcholek %d\n", buff2);
                 idx = buff2;
                 graph[idx].idx = buff2;
                 first++;
                 if (graph[idx].neighbors_count==0) graph[idx].neighbors = malloc(10 * sizeof(int));
             } else {
                 graph[idx].neighbors[graph[idx].neighbor_idx] = buff2;
-                printf("Dopisuje sasiada %d\n", buff2);
+                //printf("Dopisuje sasiada %d\n", buff2);
                 graph[idx].neighbors_count++;
                 if(graph[buff2].neighbors_count == 0) {
                     graph[buff2].neighbors = malloc(10 * sizeof(int));

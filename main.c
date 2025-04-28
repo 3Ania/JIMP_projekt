@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "pobieranie_z_pliku.h"
 #include "algorytm.h"
@@ -14,11 +15,13 @@ int main(int argc, char *argv[]){
 
     char* plik = argv[1];
 
-    int parts_amount = 2, margin = 10; // wartosci w przypasku nie podania ich przez uzytkownika
+    int parts_amount = 2, margin = 10, is_binary = 0; // wartosci w przypadku nie podania ich przez uzytkownika
+
 
     // jezeli uzytkownik poda parametry, nadpisują się
     if (argc>2) parts_amount = atoi(argv[2]);
     if (argc>3) margin = atoi(argv[3]);
+    if (argc>4 && strcmp(argv[4], "-b") == 0) is_binary = 1;
 
     // pliki do odczytu
     FILE *file = fopen(plik, "r");

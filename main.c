@@ -153,8 +153,8 @@ void divide(node *graph, int parts_amount, int *graph_parts[parts_amount], int* 
 }
 
 int main(){
-    FILE *file = fopen("graf_przyklad.csrrg", "r");
-    FILE *file2 = fopen("graf_przyklad.csrrg", "r");
+    FILE *file = fopen("graf.csrrg", "r");
+    FILE *file2 = fopen("graf.csrrg", "r");
 
     int node_amount = skip_to(file, file2);
     // printf("%d\n\n", node_amount);

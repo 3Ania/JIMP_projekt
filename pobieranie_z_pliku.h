@@ -12,7 +12,7 @@ typedef struct node{
     int neighbor_idx;
 } node;
 
-int skip_to(FILE *plf_line3, FILE *f_line4);
+int skip_to(FILE *plf_line3, FILE *f_line4, FILE *file3);
 
 void create_graph(node *graph, FILE *file, FILE *file2, int node_amount);
 

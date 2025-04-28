@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int skip_to(FILE *f_line3, FILE *f_line4){ // przwesuwa wskaźniki na dobre miejsca
+int skip_to(FILE *f_line3, FILE *f_line4, FILE *file3){ // przwesuwa wskaźniki na dobre miejsca i przepisuje pierwsze 
     int target_line3 = 3;
     int target_line4 = 4;
     int curr_line = 0;
@@ -11,18 +11,21 @@ int skip_to(FILE *f_line3, FILE *f_line4){ // przwesuwa wskaźniki na dobre miej
 
     char chr = getc(f_line3);
     char chr2 = getc(f_line4);
+    // przepisuje do pliku wyjściowego
+    putc(chr2, file3);
+
     while(chr != EOF && curr_line < target_line3){
         if(chr == '\n') curr_line++;
         if(curr_line == 1 && chr == ';'){
             node_amount++;
         }
         if(curr_line == 3 && chr == '\n');
-        else chr = getc(f_line3);
+        else {chr = getc(f_line3); putc(chr, file3);}
         chr2 = getc(f_line4);
     }
     chr2 = getc(f_line4);
-    while(chr2 != EOF && chr2 != '\n') chr2 = getc(f_line4);
-    // oba wskaźniki na dobrych miejscach
+    while(chr2 != EOF && chr2 != '\n') {chr2 = getc(f_line4);}
+    // oba wskaźniki na dobrych miejscach i powinny być przpisane 3 pierwsze linijki
 
     return node_amount;
 }

@@ -96,11 +96,25 @@ void divide(node *graph, int parts_amount, int *graph_parts[parts_amount], int* 
     }
 }
 
-int main(){
-    FILE *file = fopen("graf.csrrg", "r");
-    FILE *file2 = fopen("graf.csrrg", "r");
+int main(int argc, char *argv[]){
+    if (argc<2) // brak pliku wejściowego
+    {
+        printf("Podaj plik zawierajacy graf jako parametr.\n");
+        return 0;
+    }
+    printf("\nplik z grafem: \"%s\"\n", argv[1]);
+    char* plik = argv[1];
 
-    int node_amount = skip_to(file, file2);
+    int parts_amount = 2, margin = 10;
+
+    if (argc>2) parts_amount = atoi(argv[2]);
+    if (argc>3) margin = atoi(argv[3]);
+
+    FILE *file = fopen(plik, "r");
+    FILE *file2 = fopen(plik, "r");
+    FILE *file3 = fopen("output.txt", "w");
+
+    int node_amount = skip_to(file, file2, file3);
     printf("\nNode amount: %d\n\n", node_amount);
 
     node* graph = malloc(node_amount * sizeof(node)); // tworzy graf - tablicę wierzchołków
@@ -108,7 +122,7 @@ int main(){
     printf("Graph:\n\n");
     print_graph(graph, node_amount);
 
-    int parts_amount = 4, margin = 10; // ilość części i margines
+   // int parts_amount = 4, margin = 10; // ilość części i margines
 
     int *graph_parts[parts_amount];
     int* part_node_nr = malloc(parts_amount * sizeof(int)); // ilość wierzchołków w grupie
@@ -124,6 +138,10 @@ int main(){
             printf("%d, ", graph_parts[i][j]);
         }printf("\n");
     }
+
+    fclose(file);
+    fclose(file2);
+    fclose(file3);
 
     return 0;
 }

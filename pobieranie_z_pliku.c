@@ -2,8 +2,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "zapis_do_pliku.h"
 
-int skip_to(FILE *f_line3, FILE *f_line4, FILE *file3){ // przwesuwa wskaźniki na dobre miejsca i przepisuje pierwsze 
+int skip_to(FILE *f_line3, FILE *f_line4, FILE *file3, int is_binary){ // przwesuwa wskaźniki na dobre miejsca i przepisuje pierwsze 
     int target_line3 = 3;
     int target_line4 = 4;
     int curr_line = 0;
@@ -12,7 +13,12 @@ int skip_to(FILE *f_line3, FILE *f_line4, FILE *file3){ // przwesuwa wskaźniki 
     char chr = getc(f_line3);
     char chr2 = getc(f_line4);
     // przepisuje do pliku wyjściowego
-    putc(chr2, file3);
+    if(!is_binary) putc(chr2, file3);
+
+    int size = 100, idx = 1, temp_int;
+    char *str = malloc(size * sizeof(char));
+    char *bin = NULL;
+    str[0] = chr;
 
     while(chr != EOF && curr_line < target_line3){
         if(chr == '\n') curr_line++;
@@ -20,7 +26,43 @@ int skip_to(FILE *f_line3, FILE *f_line4, FILE *file3){ // przwesuwa wskaźniki 
             node_amount++;
         }
         if(curr_line == 3 && chr == '\n');
-        else {chr = getc(f_line3); putc(chr, file3);}
+        else {
+            chr = getc(f_line3);
+            if(!is_binary) {
+                putc(chr, file3);
+            }
+            else{
+                if(chr == ';'){
+                    str[idx] = '\0';
+                    temp_int = atoi(str);
+                    free(str);
+                    idx = 0;
+                    str = malloc(size * sizeof(char));
+                    bin = malloc(temp_int * 10 * sizeof(char));
+                    bin = to_binary(temp_int);
+                    fprintf(file3, "%s;", bin);
+                    free(bin);
+                }else if(chr == '\n'){
+                    str[idx] = '\0';
+                    temp_int = atoi(str);
+                    free(str);
+                    idx = 0;
+                    str = malloc(size * sizeof(char));
+                    bin = malloc(temp_int * 10 * sizeof(char));
+                    bin = to_binary(temp_int);
+                    fprintf(file3, "%s\n", bin);
+                    free(bin);
+                }else{
+                    if(idx >= size){
+                        size *= 2;
+                        str = realloc(str, size*sizeof(char));
+                    }
+                    str[idx] = chr;
+                    idx++;
+                    str[idx] = '\0';
+                }
+            }
+        }
         chr2 = getc(f_line4);
     }
     chr2 = getc(f_line4);

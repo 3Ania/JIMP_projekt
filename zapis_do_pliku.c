@@ -1,19 +1,31 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "pobieranie_z_pliku.h"
 #include "zapis_do_pliku.h"
 
 char *to_binary(int num){
+    if (num == 0) {
+        char* zero_str = malloc(2 * sizeof(char));
+        if (zero_str) { // Sprawdzenie wyniku malloc
+            zero_str[0] = '0';
+            zero_str[1] = '\0';
+        }
+        return zero_str; // Zwróć "0" lub NULL
+    }
+    if (num < 0) return NULL;
+
     int size = 10, idx = 0;
     char* bin = malloc(size * sizeof(char));
+    if (!bin) return NULL;
 
     while(num > 0){ // zamiana na binarny (wynik odwrotny)
-        if(idx == size){
+        if(idx >= size - 1){
             size *= 2;
             bin = realloc(bin, size * sizeof(char));
         }
-        printf("%d ", num);
+        // printf("%d ", num);
         bin[idx] = '0' + (num % 2);
         idx++;
         num /= 2;
@@ -90,21 +102,26 @@ void sort_parts(int parts_amount, int* part_node_nr, int *graph_parts[parts_amou
     }
 }
 
-void write_to_file(FILE* file3, int node_amount, int parts_amount, int* part_node_nr, node *graph_for_print, int *graph_parts[parts_amount]){ // zapisuje do pliku
+void write_to_file(FILE* file3, int node_amount, int parts_amount, int* part_node_nr, node *graph_for_print, int *graph_parts[parts_amount], int is_binary){ // zapisuje do pliku
     int i, j, k, l;
 
-    int size_l5 = node_amount; // wielkosc dla tablicy char line5
+    int size_l5 = node_amount*10; // wielkosc dla tablicy char line5
     char *line5 = malloc(size_l5 * sizeof(char)); // alokacja pamieci dla line5
+
+
     int idx = 0, i2, x = 0;
-    int number = 0, n2;
+    int number = 0, temp_num;
+    long long n2;
+    char *temp_str = NULL, *str = NULL;
     char temp;
+
     for(i = 0; i < parts_amount; i++){ // przechodzi po wszystkich partycjach
         for(j = 0; j < part_node_nr[i]; j++){ // przechodzi po wierzcholkach w danej grupie
             node node_to_print = graph_for_print[graph_parts[i][j]]; // zapisuje aktualny node do wypisania
-            fprintf(file3, "%d;", node_to_print.idx); // zapisuje node do pliku
-
+            if(is_binary) fprintf(file3, "%s;", to_binary(node_to_print.idx)); // zapisuje node do pliku binarnie
+            else fprintf(file3, "%d;", node_to_print.idx);
             // pobieranie danych do linijki 5 pliku
-            if(idx >= size_l5 - 3){
+            if(idx >= size_l5 - 10){
                 size_l5 *= 2;
                 line5 = realloc(line5, size_l5 * sizeof(char)); // jezeli potrzeba, reallocuje
             }
@@ -126,12 +143,29 @@ void write_to_file(FILE* file3, int node_amount, int parts_amount, int* part_nod
                 line5[i2 + l] = line5[idx -1 -l];
                 line5[idx -1 -l] = temp;
             }
+            
+            if(is_binary){
+                temp_str = malloc((x+1) * sizeof(char));
+                for(l = 0; l < x; l++) temp_str[l] = line5[i2+l];
+                temp_str[l] = '\0';
+                temp_num = atoi(temp_str);
+                free(temp_str);
+
+                str = malloc((int)(log2(temp_num)) * sizeof(char));
+                str = to_binary(temp_num);
+                for(l = 0; l < (int)(log2(temp_num)); l++){
+                    line5[i2+l] = str[l];
+                    if(i2+l >= idx) idx++;
+                }
+            }
+
             line5[idx] = ';'; // dopisuje po kazdej liczbie średnik
             idx++;
             number++;
             for(k = 0; k < node_to_print.neighbors_count; k++){ // wypisuje w linijce czwartej pliku wszytskich sąsiadów aktualnego wierzcholka
                 if(node_to_print.neighbors[k] != -1){
-                    fprintf(file3, "%d;", node_to_print.neighbors[k]);
+                    if(is_binary) fprintf(file3, "%s;", to_binary(node_to_print.neighbors[k])); // zapisuje node do pliku binarnie
+                    else fprintf(file3, "%d;", node_to_print.neighbors[k]);
                     number++;
                 }
             }

@@ -4,6 +4,34 @@
 #include "pobieranie_z_pliku.h"
 #include "zapis_do_pliku.h"
 
+char *to_binary(int num){
+    int size = 10, idx = 0;
+    char* bin = malloc(size * sizeof(char));
+
+    while(num > 0){ // zamiana na binarny (wynik odwrotny)
+        if(idx == size){
+            size *= 2;
+            bin = realloc(bin, size * sizeof(char));
+        }
+        printf("%d ", num);
+        bin[idx] = '0' + (num % 2);
+        idx++;
+        num /= 2;
+    }
+
+    // odrocenie kolejnosci
+    int i;
+    char temp;
+    for(i = 0; i < idx/2; i++){
+        temp = bin[i];
+        bin[i] = bin[idx-i-1];
+        bin[idx-i-1] = temp;
+    }
+    bin[idx] = '\0'; // dodanie konca stringa na koniec znakow
+
+    return bin;
+}
+
 int is_in_part(int node, int parts_amount, int part_node_nr, int graph_parts[parts_amount]){ // sprawdza, czy node jest w danej grupie
     int is_in = 0;
     int i;

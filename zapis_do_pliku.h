@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include "pobieranie_z_pliku.h"
 
+char *to_binary(int num);
+
 int is_in_part(int node, int parts_amount, int part_node_nr, int graph_parts[]);
 
 node* copy_graph(node* graph, node* graph_for_print, int node_amount);

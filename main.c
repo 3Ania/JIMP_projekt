@@ -192,6 +192,75 @@ void delete_edges(node* graph_for_print, int parts_amount, int *part_node_nr, in
     }
 }
 
+void sort_parts(int parts_amount, int* part_node_nr, int *graph_parts[parts_amount]){
+    int i, j, k, temp;
+    for(i = 0; i < parts_amount; i++){
+        for(j = 0; j < part_node_nr[i]; j++){
+            for(k = j; k < part_node_nr[i]; k++){
+                if(graph_parts[i][j] > graph_parts[i][k]){
+                    temp = graph_parts[i][j];
+                    graph_parts[i][j] = graph_parts[i][k];
+                    graph_parts[i][k] = temp;
+                }
+            }
+        }
+    }
+}
+
+void write_to_file(FILE* file3, int node_amount, int parts_amount, int* part_node_nr, node *graph_for_print, int *graph_parts[parts_amount]){
+    int i, j, k, l;
+
+    int size_l5 = node_amount;
+    char *line5 = malloc(size_l5 * sizeof(char));
+    int idx = 0, i2, x = 0;
+    int number = 0, n2;
+    char temp;
+    for(i = 0; i < parts_amount; i++){
+        for(j = 0; j < part_node_nr[i]; j++){
+            node node_to_print = graph_for_print[graph_parts[i][j]];
+            fprintf(file3, "%d;", node_to_print.idx);
+            if(idx >= size_l5 - 3){
+                size_l5 *= 2;
+                line5 = realloc(line5, size_l5 * sizeof(char));
+            }
+            n2 = number;
+            i2 = idx;
+            x = 0;
+            if(n2 == 0){
+                line5[idx] = (char)('0'+(n2%10));
+                idx++;
+            }
+            while(n2 > 0){
+                line5[idx] = (char)('0'+(n2%10));
+                n2 /= 10;
+                idx++;
+                x++;
+            }
+            for(l = 0; l < x/2; l++){
+                temp = line5[i2 + l];
+                line5[i2 + l] = line5[idx -1 -l];
+                line5[idx -1 -l] = temp;
+            }
+            line5[idx] = ';';
+            idx++;
+            number++;
+            for(k = 0; k < node_to_print.neighbors_count; k++){
+                if(node_to_print.neighbors[k] != -1){
+                    fprintf(file3, "%d;", node_to_print.neighbors[k]);
+                    number++;
+                }
+            }
+        }
+        line5[idx] = '\n';
+        idx++;
+    }
+    fprintf(file3, "\n");
+
+    for(i = 0; i < idx; i++){
+        fprintf(file3, "%c", line5[i]);
+    }
+}
+
 int main(int argc, char *argv[]){
     if (argc<2) // brak pliku wejściowego
     {
@@ -230,6 +299,8 @@ int main(int argc, char *argv[]){
 
     printf("Number of parts: %d\nMarigin: %d\n\n", parts_amount, margin);
 
+    sort_parts(parts_amount, part_node_nr, graph_parts);
+
     int i, j;
     for(i = 0; i < parts_amount; i++){
         printf("Group %d: ", i);
@@ -240,10 +311,11 @@ int main(int argc, char *argv[]){
 
     delete_edges(graph_for_print, parts_amount, part_node_nr, graph_parts);
 
-    print_graph(graph_for_print, node_amount);
+    //zapisywanie wyniku do pliku
+
+    write_to_file(file3, node_amount, parts_amount, part_node_nr, graph_for_print, graph_parts);
 
     fclose(file);
     fclose(file2);
     fclose(file3);
-    
 }

@@ -59,7 +59,7 @@ node min_neighbour(node start_node, node *graph, int n, possible_next_node *pn){
 
     int i;
     for(i = 0; i < start_node.neighbors_count; i++){
-        // printf("neighbor: %d; ", graph[start_node.neighbors[i]].idx);
+
         if(not_in(graph[start_node.neighbors[i]].idx, pn) && graph[start_node.neighbors[i]].neighbors_count != -1 && graph[start_node.neighbors[i]].idx != start_node.idx) {
             pn->poss_next[pn->idx] = graph[start_node.neighbors[i]].idx;
             pn->idx += 1;
@@ -71,16 +71,14 @@ node min_neighbour(node start_node, node *graph, int n, possible_next_node *pn){
     }
 
     for(i = 0; i < pn->idx; i++){
-        // if(pn->poss_next[i] != -1) printf("poss_next: %d,", pn->poss_next[i]);
+
         if( pn->poss_next[i] != -1 && graph[pn->poss_next[i]].neighbors_count < min ){
             min = graph[pn->poss_next[i]].neighbors_count;
             min_n = graph[pn->poss_next[i]];
             pn_idx = i;
         }
     }
-    // printf("\n");
 
-    // printf("idx: %d, node: %d\n", pn_idx, pn->poss_next[pn_idx]);
     pn->poss_next[pn_idx] = -1;
 
     return min_n;
@@ -96,7 +94,7 @@ void calculate_nr_of_nodes_in_parts(int* part_node_nr, int parts_amount, int n){
 }
 
 void delete_node(node *graph, node n, int node_amount){ // usuwa wierzchołek (też z listy sąsiadów innych wierzchołków)
-    // printf("n number: %d\n", n.idx);
+
     graph[n.idx].neighbors_count = -1;
     int i, j, k;
     for(i = 0; i < node_amount; i++){
@@ -133,20 +131,17 @@ void divide(node *graph, int parts_amount, int *graph_parts[parts_amount], int* 
     for(i = 0; i < parts_amount; i++){
         start_node = min_node(graph, n, &pn); // pobiera pierwszy "początkowy" wierzchołek dla i-tej grupy
         graph_parts[i][0] = start_node.idx;
-        // printf("i, 0: %d\n", graph_parts[i][0]);
-        // printf("start: %d\n", start_node.idx);
-        // printf("i: %d, parts_mount: %d \n\n", i, parts_amount);
+
         for(curr_node_amount = 1; curr_node_amount < part_node_nr[i]; curr_node_amount++){ // powtarza tyle razy ile ma być wierzchołków w grupie
             next = min_neighbour(start_node, graph, n, &pn); // znajduje następny wierzchołek, który zostanie dodany do grupy
             graph_parts[i][curr_node_amount] = next.idx;
-            // printf("next: %d\n", next.idx);
+
             delete_node(graph, start_node, n); // usuwa ostatni wierzchołek
-            // print_graph(graph);
+
             start_node = next;
         }
-        // printf("new part: \n\n");
+
         delete_node(graph, start_node, n);
-        // print_graph(graph);
     }
 }
 
@@ -264,23 +259,29 @@ void write_to_file(FILE* file3, int node_amount, int parts_amount, int* part_nod
 int main(int argc, char *argv[]){
     if (argc<2) // brak pliku wejściowego
     {
-        printf("Podaj plik zawierajacy graf jako parametr.\n");
+        printf("Provide a file containing a graph as a parameter.\n");
         return 0;
     }
-    printf("\nplik z grafem: \"%s\"\n", argv[1]);
+
     char* plik = argv[1];
 
     int parts_amount = 2, margin = 10;
 
     if (argc>2) parts_amount = atoi(argv[2]);
-    if (argc>3) margin = atoi(argv[3]);
+    if (argc>3 && argv[3]>=0) margin = atoi(argv[3]);
 
     FILE *file = fopen(plik, "r");
     FILE *file2 = fopen(plik, "r");
     FILE *file3 = fopen("output.txt", "w");
 
+    if (file == NULL) { // plik z grafem nie istnieje
+        printf("File not found.\n");
+        return 0;
+    } else printf("\nFile: \"%s\"\n", argv[1]);
+
     int node_amount = skip_to(file, file2, file3);
     printf("\nNode amount: %d\n\n", node_amount);
+    if(parts_amount>2 && node_amount<parts_amount) {parts_amount=2;}
 
     node* graph = malloc(node_amount * sizeof(node)); // tworzy graf - tablicę wierzchołków
     node* graph_for_print = malloc(node_amount * sizeof(node));
@@ -306,7 +307,7 @@ int main(int argc, char *argv[]){
         printf("Group %d: ", i);
         for(j = 0; j < part_node_nr[i]; j++){
             printf("%d, ", graph_parts[i][j]);
-        }printf("\n");
+        }printf("\n\n");
     }printf("\n");
 
     delete_edges(graph_for_print, parts_amount, part_node_nr, graph_parts);

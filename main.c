@@ -34,7 +34,7 @@ int main(int argc, char *argv[]){
         return 0;
     } else printf("\nFile: \"%s\"\n", argv[1]);
 
-    int node_amount = skip_to(file, file2, file3); // odczytywanie pliku, zwraca ilosc wierzcholkow w grafie, przechodzi do potrzebnego miejsca (linijka 4,5)
+    int node_amount = skip_to(file, file2, file3, is_binary); // odczytywanie pliku, zwraca ilosc wierzcholkow w grafie, przechodzi do potrzebnego miejsca (linijka 4,5)
     printf("\nNode amount: %d\n\n", node_amount);
     if(parts_amount>2 && node_amount<parts_amount) {parts_amount=2;}
 
@@ -66,7 +66,7 @@ int main(int argc, char *argv[]){
     delete_edges(graph_for_print, parts_amount, part_node_nr, graph_parts); // usuwa niepotrzebne krawędzie między wierzchołkami
 
     //zapisywanie wyniku do pliku
-    write_to_file(file3, node_amount, parts_amount, part_node_nr, graph_for_print, graph_parts);
+    write_to_file(file3, node_amount, parts_amount, part_node_nr, graph_for_print, graph_parts, is_binary);
 
     fclose(file);
     fclose(file2);
